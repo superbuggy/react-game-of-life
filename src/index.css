@@ -1,13 +1,44 @@
-body {
+
+.cells-container {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  max-width: 90vmin;
+  max-height: 90vmin;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 2.5%);
+  /* grid-template-rows: repeat(auto-fill, 5vmin); */
+  grid-auto-rows: 1fr;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+.cells-container::before {
+  content: '';
+  width: 0;
+  padding-bottom: 100%;
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+
+.square:first-child {
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+
+/* Just to make the grid visible */
+
+.square {
+  background: rgba(0,0,0,0.1);
+  transition: 1s background;
+}
+
+.active {
+  transition: .5s background;
+  background: rgb(132, 233, 0);
+}
+.on-deck {
+  transition: .5s background;
+  background: rgb(31, 173, 86);
+}
+.dying {
+  transition: 1.5s background;
+  background: rgb(39, 97, 0, .2);
 }
