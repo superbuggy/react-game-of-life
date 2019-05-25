@@ -1,12 +1,17 @@
+:root {
+  --cell-size: 2%;
+}
 
 .cells-container {
+  transform: rotate(90deg);
+  overflow: hidden;
+  background: rgb(0, 53, 33);
   margin: 0;
   padding: 0;
   max-width: 90vmin;
   max-height: 90vmin;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 2.5%);
-  /* grid-template-rows: repeat(auto-fill, 5vmin); */
+  grid-template-columns: repeat(auto-fill, var(--cell-size));
   grid-auto-rows: 1fr;
 }
 
@@ -23,11 +28,10 @@
   grid-column: 1 / 1;
 }
 
-/* Just to make the grid visible */
-
 .square {
-  background: rgba(0,0,0,0.1);
+  background: transparent;
   transition: 1s background;
+  border: none;
 }
 
 .active {
@@ -36,9 +40,41 @@
 }
 .on-deck {
   transition: .5s background;
-  background: rgb(31, 173, 86);
+  background: rgba(9, 255, 0, 0.4);
 }
 .dying {
-  transition: 1.5s background;
-  background: rgb(39, 97, 0, .2);
+  background: rgba(233, 0, 183, 0.185);
+  transition: .5s background;
+  animation: dying-flash .5s linear;
+}
+
+@keyframes dying-flash {
+  0% 
+  {
+    background: rgba(184, 4, 255, 0.425);
+  }
+  
+  100% 
+  {
+    background: transparent;
+  }
+
+
+}
+@keyframes flash {
+  0% 
+  {
+    border-right: 100vmin solid rgba(255, 255, 255, 0.1);
+  }
+  
+  50% 
+  {
+    border-right: 100vmin solid rgba(255, 255, 255, 0);
+  }
+  99%
+  {
+    border: none;
+  }
+
+
 }
