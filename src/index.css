@@ -1,11 +1,13 @@
 :root {
   --cell-size: 2%;
+  /* --background-color: hsl(157, 100%, 10%); */
+  --background-color: hsl(279, 32%, 23%);
 }
 
 .cells-container {
   transform: rotate(90deg);
   overflow: hidden;
-  background: rgb(0, 53, 33);
+  background: var(--background-color);
   margin: 0;
   padding: 0;
   max-width: 90vmin;

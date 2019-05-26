@@ -1,19 +1,26 @@
 import React, { Component } from 'react'
+import { map } from './utils'
 
 export default class GameOfLife extends Component {
 
   constructor (props) {
     super(props)
+
     const RESOLUTION = 40
+    const maxPopIsh = 0.25 * RESOLUTION ** 2
+    const minPopIsh = 0.10 * maxPopIsh//0.25 * maxPopIsh
+
     this.state = {
       grid: [],
       columns: RESOLUTION,
       rows: RESOLUTION,
       timerId: null,
-      freqeuncy: 50,
+      freqeuncy: 1000 / 60,   
       population: 0
     }
 
+    this.maxPopIsh = maxPopIsh
+    this.minPopIsh = minPopIsh
   }
 
   make2DArray = (columns, rows) => Array
@@ -28,10 +35,11 @@ export default class GameOfLife extends Component {
       for (let j = -1; j < 2; j++) {
         let col = (x + i + columns) % columns;
         let row = (y + j + rows) % rows;
+        if (x === col && y === row) continue;
         sum += grid[col][row];
       }
     }
-    sum -= grid[x][y];
+    // sum -= grid[x][y];
     return sum;
   }
 
@@ -51,6 +59,13 @@ export default class GameOfLife extends Component {
     this.setState( prevState => ({ grid }) )
   }
 
+  countPopulation (grid) {
+    return grid.reduce( 
+      (tally, row) => tally + row.reduce((tally, cell) => tally + cell, 0),
+      0
+    )
+  }
+
   nextGridState = () => {
     this.setState( ({ rows, columns, grid }) => {
       const nextGrid = grid.map( (row, rowIndex) => {
@@ -67,10 +82,9 @@ export default class GameOfLife extends Component {
           }
         })
       })
-      const population = nextGrid.reduce( 
-        (tally, row) => tally + row.reduce((tally, cell) => tally + cell, 0),
-        0
-      )
+
+      const population = this.countPopulation(nextGrid)
+
       return {
         grid: nextGrid,
         population
@@ -82,17 +96,32 @@ export default class GameOfLife extends Component {
 
   componentDidMount() {
     this.initGrid()
-    this.initCycle()
-    this.setCSSVars()
+    // this.initCycle()
+    this.initAnimation()
+    this.updateCSS()
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.setCSSVars()
+    this.updateCSS()
   }
   
 
-  setCSSVars = () => {
+  updateCSS = () => {
     document.documentElement.style.setProperty('--cell-size', `${100 / this.state.rows }%`)
+    //hue hsla(154, 78%, 9%, 1)  - hsla(268, 78%, 9%, 1)
+    //hue hsla(154, 78%, 57%, 1)  - hsla(268, 78%, 57%, 1)
+    const hue = map(this.minPopIsh, this.maxPopIsh * .7, 268 * 1.3, 154, this.state.population)
+    const light = map(this.minPopIsh, this.maxPopIsh, 15, 35, this.state.population)
+    console.log(hue, light)
+    document.documentElement.style.setProperty(
+      '--background-color', `hsl(${hue}, 78%, ${light}%)`
+    )
+
+  }
+
+  initAnimation = () => {
+    this.animationFrame = requestAnimationFrame(this.initAnimation)
+    this.nextGridState()
   }
 
   initCycle = () => {
