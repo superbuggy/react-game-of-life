@@ -6,7 +6,7 @@ export default class GameOfLife extends Component {
   constructor (props) {
     super(props)
 
-    const RESOLUTION = 40
+    const RESOLUTION = 64
     const maxPopIsh = 0.25 * RESOLUTION ** 2
     const minPopIsh = 0.10 * maxPopIsh//0.25 * maxPopIsh
 
@@ -149,7 +149,6 @@ export default class GameOfLife extends Component {
 
     return (
       <div>
-        <h1>{this.state.population}</h1>
         <div 
           className={'cells-container'}
           onClick={this.initGrid}

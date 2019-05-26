@@ -1,20 +1,21 @@
 :root {
   --cell-size: 2%;
-  /* --background-color: hsl(157, 100%, 10%); */
   --background-color: hsl(279, 32%, 23%);
+  --container-size: 90vmin;
 }
 
 .cells-container {
-  transform: rotate(90deg);
+
   overflow: hidden;
   background: var(--background-color);
   margin: 0;
   padding: 0;
-  max-width: 90vmin;
-  max-height: 90vmin;
+  max-width: var(--container-size);
+  max-height: var(--container-size);
   display: grid;
   grid-template-columns: repeat(auto-fill, var(--cell-size));
   grid-auto-rows: 1fr;
+  transition: .666s background;
 }
 
 .cells-container::before {
@@ -31,9 +32,10 @@
 }
 
 .square {
+  box-sizing: border-box;
   background: transparent;
   transition: 1s background;
-  border: none;
+  border: transparent;
 }
 
 .active {
@@ -60,23 +62,4 @@
   {
     background: transparent;
   }
-
-
-}
-@keyframes flash {
-  0% 
-  {
-    border-right: 100vmin solid rgba(255, 255, 255, 0.1);
-  }
-  
-  50% 
-  {
-    border-right: 100vmin solid rgba(255, 255, 255, 0);
-  }
-  99%
-  {
-    border: none;
-  }
-
-
 }
