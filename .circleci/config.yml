@@ -4,6 +4,9 @@ jobs:
     docker:
       - image: kkarczmarczyk/node-yarn
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - $GH_REPO_FINGERPRINTS
       - run: git clone git@github.com:superbuggy/react-game-of-life.git
       - run: cd react-game-of-life
       - run: yarn
