@@ -1,11 +1,11 @@
 version: 2
 jobs:
   build:
+    machine:
+      enabled: true
     docker:
       - image: circleci/node
     steps:
-      machine:
-        enabled: true
       - add_ssh_keys:
           fingerprints:
             - "SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8"
