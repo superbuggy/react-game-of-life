@@ -27,7 +27,7 @@ jobs:
       - run:
           name: "Clean up old source files SSH"
           command: |
-            ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && rm -rf public/* && "
+            ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && rm -rf public/*"
       - run:
           name: "Copy sources files SSH"
           command: |
