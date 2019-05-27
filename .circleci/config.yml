@@ -12,7 +12,7 @@ jobs:
       - run: yarn
       - run: yarn build
       - persist_to_workspace:
-          root: build
+          root: project/build
   deploy:
     machine:
       enabled: true
