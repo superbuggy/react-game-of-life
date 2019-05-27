@@ -12,7 +12,7 @@ jobs:
       - run: yarn
       - run: yarn build
       - persist_to_workspace:
-          root: react-game-of-life
+          root: build
   deploy:
     machine:
       enabled: true
