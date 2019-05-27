@@ -6,7 +6,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8"
+            - "SHA256:hNPpVVoVuz9YrtVyJlyC7YQI5WoQshfgF8IqEllnRZk"
             - "81:c7:09:20:03:fc:93:db:1e:5b:a5:4b:e3:55:24:81"
       - checkout
       - run: yarn
