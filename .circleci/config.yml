@@ -23,9 +23,13 @@ jobs:
             - "SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8"
             - "81:c7:09:20:03:fc:93:db:1e:5b:a5:4b:e3:55:24:81"
       - attach_workspace:
-          at: build
+          at: .
       - run:
-          name: "Deploy Over SSH"
+          name: "Clean up old source files SSH"
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && rm -rf public/* && "
+      - run:
+          name: "Copy sources files SSH"
           command: |
             scp -r build/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
