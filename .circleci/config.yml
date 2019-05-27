@@ -31,7 +31,7 @@ jobs:
       - run:
           name: "Copy sources files SSH"
           command: |
-            scp -r build/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+            scp -r build/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
 workflows:
   version: 2
