@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: kkarczmarczyk/node-yarn
+      - image: circleci/node
     steps:
       - add_ssh_keys:
           fingerprints:
