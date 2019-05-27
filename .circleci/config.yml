@@ -6,13 +6,12 @@ jobs:
       - run: yarn build
   deploy:
     steps:
-      - run:
-    machine:
-      enabled: true
-          name: "Deploy Over SSH"
-          command: |
-            scp -r build/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
-
+      - run: scp -r build/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+    # machine:
+    #   enabled: true
+    #       name: "Deploy Over SSH"
+    #       command: |
+            
 workflows:
   version: 2
   build-and-deploy:
