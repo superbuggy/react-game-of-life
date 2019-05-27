@@ -6,7 +6,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - $GH_REPO_FINGERPRINTS
+            - $GH_REPO_FINGERPRINT
       - run: git clone git@github.com:superbuggy/react-game-of-life.git
       - run: cd react-game-of-life
       - run: yarn
