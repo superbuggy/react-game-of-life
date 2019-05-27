@@ -4,6 +4,8 @@ jobs:
     docker:
       - image: kkarczmarczyk/node-yarn
     steps:
+      - run: git clone git@github.com:superbuggy/react-game-of-life.git
+      - run: cd react-game-of-life
       - run: yarn
       - run: yarn build
   deploy:
