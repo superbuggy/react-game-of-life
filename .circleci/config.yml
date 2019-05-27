@@ -9,7 +9,7 @@ jobs:
       - run:
     machine:
       enabled: true
-          name: Deploy Over SSH
+          name: "Deploy Over SSH"
           command: |
             scp -r build/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
