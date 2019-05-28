@@ -108,11 +108,8 @@ export default class GameOfLife extends Component {
 
   updateCSS = () => {
     document.documentElement.style.setProperty('--cell-size', `${100 / this.state.rows }%`)
-    //hue hsla(154, 78%, 9%, 1)  - hsla(268, 78%, 9%, 1)
-    //hue hsla(154, 78%, 57%, 1)  - hsla(268, 78%, 57%, 1)
     const hue = map(this.minPopIsh, this.maxPopIsh * .7, 268 * 1.3, 154, this.state.population)
     const light = map(this.minPopIsh, this.maxPopIsh, 15, 35, this.state.population)
-    console.log(hue, light)
     document.documentElement.style.setProperty(
       '--background-color', `hsl(${hue}, 78%, ${light}%)`
     )

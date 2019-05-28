@@ -4,11 +4,16 @@
   --container-size: 90vmin;
 }
 
-.cells-container {
+body {
+  background: hsl(279, 32%, 13%);
+}
 
+.cells-container {
+  
   overflow: hidden;
   background: var(--background-color);
-  margin: 0;
+  transition: .666s background;
+  margin: 0 auto;
   padding: 0;
   max-width: var(--container-size);
   max-height: var(--container-size);
