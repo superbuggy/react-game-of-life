@@ -1,3 +1,4 @@
+import * as Tone from "tone";
 import { Component } from "react";
 import { map } from "./utils";
 import "./App.css";
@@ -10,26 +11,35 @@ interface GameState {
   population: number;
 }
 
-type Grid = number[][]
+type Grid = number[][];
 export default class GameOfLife extends Component<GameState> {
-  size = 16;
+  size = 7;
 
   maxPopIsh = 0.25 * this.size ** 2;
   minPopIsh = 0.1 * this.maxPopIsh; //0.25 * maxPopIsh;
-  animationFrame = -1
-  // timerId = -1
+  animationFrame = -1;
+  timerId = -1;
+  toneLattice = [[0]];
 
   state: GameState = {
     grid: [],
     columns: this.size,
     rows: this.size,
-    frequency: 4000,
+    frequency: 1000,
     population: 0,
   };
 
-   make2DArray = (columns: number, rows: number): Grid => {
+  make2DArray = (columns: number, rows: number): Grid => {
     return Array.from({ length: columns }, () => Array.from({ length: rows }, () => 0));
-};
+  };
+
+  makeToneLattice = (): number[][] => {
+    const baseFrequency = 110;
+    return this.state.grid.map((row: number[], rowIndex: number) => {
+      const baseRowFrequency = baseFrequency * (3 / 2) ** rowIndex;
+      return row.map((_, columnIndex: number) => baseRowFrequency * (5 / 4) ** columnIndex);
+    });
+  };
 
   countNeighbors = (grid: Array<[]>, x: number, y: number) => {
     const { columns, rows } = this.state;
@@ -60,12 +70,29 @@ export default class GameOfLife extends Component<GameState> {
 
   initGrid = () => {
     const grid = this.randomizeGrid(this.make2DArray(this.state.columns, this.state.rows));
-    this.setState(() => ({ grid }));
+    this.setState(
+      () => ({ grid }),
+      () => {
+        this.toneLattice = this.makeToneLattice();
+        console.log(this.toneLattice);
+      }
+    );
   };
 
   countPopulation(grid: Grid) {
     return grid.reduce((tally, row) => tally + row.reduce((tally, cell) => tally + cell, 0), 0);
   }
+
+  playTone = (frequency: number): void => {
+    const synth = new Tone.Synth().toDestination();
+    const now = Tone.now();
+
+    synth.volume.value = map(this.state.population, this.maxPopIsh, -24, -6, this.state.population);
+    // trigger the attack immediately
+    synth.triggerAttack(frequency, now);
+    // wait one second before triggering the release
+    synth.triggerRelease(now + this.state.frequency / 1000);
+  };
 
   nextGridState = () => {
     this.setState(({ grid }: GameState) => {
@@ -73,6 +100,7 @@ export default class GameOfLife extends Component<GameState> {
         return row.map((cell, cellIndex) => {
           const neighbors = this.countNeighbors(grid, rowIndex, cellIndex);
           if (cell === 0 && neighbors === 3) {
+            this.playTone(this.toneLattice[rowIndex][cellIndex]);
             return 1;
           } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
             return 0;
@@ -94,8 +122,9 @@ export default class GameOfLife extends Component<GameState> {
 
   componentDidMount() {
     this.initGrid();
-    // this.initCycle()
-    this.initAnimation();
+    this.initCycle();
+    // this.initAnimation();
+
     this.updateCSS();
   }
 
@@ -105,9 +134,9 @@ export default class GameOfLife extends Component<GameState> {
 
   updateCSS = () => {
     document.documentElement.style.setProperty("--cell-size", `${100 / this.state.rows}%`);
-    const hue = map(this.minPopIsh, this.maxPopIsh * 0.7, 268 * 1.3, 154, this.state.population);
-    const light = map(this.minPopIsh, this.maxPopIsh, 15, 35, this.state.population);
-    document.documentElement.style.setProperty("--background-color", `hsl(${hue}, 78%, ${light}%)`);
+    // const hue = map(this.minPopIsh, this.maxPopIsh * 0.7, 268 * 1.3, 154, this.state.population);
+    // const light = map(this.minPopIsh, this.maxPopIsh, 15, 35, this.state.population);
+    // document.documentElement.style.setProperty("--background-color", `hsl(${hue}, 78%, ${light}%)`);
   };
 
   initAnimation = () => {
@@ -115,9 +144,9 @@ export default class GameOfLife extends Component<GameState> {
     this.nextGridState();
   };
 
-  // initCycle = () => {
-  //   this.timerId = setInterval(this.nextGridState, this.state.frequency)
-  // }
+  initCycle = () => {
+    this.timerId = setInterval(this.nextGridState, this.state.frequency);
+  };
 
   render() {
     const grid = this.state.grid.map((row, rowIndex) => {
