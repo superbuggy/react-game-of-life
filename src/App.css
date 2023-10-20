@@ -1,6 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Rubik+Pixels&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Pixels&family=Sometype+Mono&display=swap');
+
 :root {
-  --cell-size: 2%;
+  --cell-size: 12.85714286vmin;
   --background-color: hsl(279, 32%, 23%);
   --container-size: 90vmin;
 }
@@ -42,6 +43,19 @@
   background: transparent;
   transition: 1s background;
   border: transparent;
+  height: var(--cell-size);
+  font-family: 'Sometype Mono';
+  vertical-align: bottom;
+  text-align: center;
+  color: white;
+  display: inline-block;
+}
+
+.square span {
+  line-height: var(--cell-size);
+}
+.square span sup {
+  font-size: .625rem;
 }
 
 .alive {
