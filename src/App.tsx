@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { useEffect, useState, FC } from "react";
-import { map, make2DArray, centsOff, noteHz } from "./utils";
+import { map, make2DArray, centsOff, noteHz, truncate } from "./utils";
 import "./App.css";
 
 type Grid = number[][];
@@ -139,7 +139,7 @@ const GameOfLife: FC = () => {
         `${frequencies.length}n`
       );
       sequence.loop = false;
-      return sequence.start(); 
+      return sequence.start();
     };
 
     const playGrid = (grid: Grid) => {
@@ -199,6 +199,19 @@ const GameOfLife: FC = () => {
     };
   }, []);
 
+  const cellLabel = (rowIndex: number, cellIndex: number) => {
+    const note = noteHz(toneLattice[rowIndex]?.[cellIndex]);
+    const nextNoteHigher = noteHz(
+      toneLattice[rowIndex]?.[cellIndex] * 2 ** (1 / 12)
+    );
+    console.log(note, nextNoteHigher);
+    const cents = centsOff(toneLattice[rowIndex]?.[cellIndex]);
+    return {
+      note: cents <= -50 ? nextNoteHigher : note,
+      cents: cents <= -50 ? truncate(cents + 100) : cents,
+    };
+  };
+
   const gridElements = state.grid.map((row, rowIndex) => {
     return row.map((cell, cellIndex) => {
       let className = "square";
@@ -213,8 +226,8 @@ const GameOfLife: FC = () => {
       return (
         <div key={`${rowIndex} ${cellIndex}`} className={className}>
           <span>
-            {noteHz(toneLattice[rowIndex]?.[cellIndex])}
-            <sup>{centsOff(toneLattice[rowIndex]?.[cellIndex])}</sup>
+            {cellLabel(rowIndex, cellIndex).note}
+            <sup>{cellLabel(rowIndex, cellIndex).cents}</sup>
           </span>
         </div>
       );
@@ -232,7 +245,6 @@ const GameOfLife: FC = () => {
       <div className={"cells-container"}>
         {state.hasStarted ? gridElements : buttonElement}
       </div>
-      <p>{state.population}</p>
     </>
   );
 };
