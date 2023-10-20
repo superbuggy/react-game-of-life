@@ -13,7 +13,7 @@ interface GameState {
 }
 
 type Grid = number[][];
-export default class GameOfLife extends Component {
+export default class GameOfLife extends Component<GameState> {
   size = 7;
   maxPopIsh = 0.25 * this.size ** 2;
   minPopIsh = 0.1 * this.maxPopIsh; //0.25 * maxPopIsh;
@@ -108,31 +108,33 @@ export default class GameOfLife extends Component {
   };
 
   nextGridState = () => {
-    this.setState(({ grid }: GameState) => {
-      const nextGrid = grid.map((row, rowIndex) => {
-        return row.map((cell, cellIndex) => {
-          const neighbors = this.countNeighbors(grid, rowIndex, cellIndex);
-          if (cell === 0 && neighbors === 3) {
-            return 1;
-          } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-            return 0;
-          } else {
-            const negativeEntropy = Math.floor(Math.random() * 1.0002);
-            return cell || negativeEntropy;
-          }
+    this.setState(
+      ({ grid }: GameState) => {
+        const nextGrid = grid.map((row, rowIndex) => {
+          return row.map((cell, cellIndex) => {
+            const neighbors = this.countNeighbors(grid, rowIndex, cellIndex);
+            if (cell === 0 && neighbors === 3) {
+              return 1;
+            } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+              return 0;
+            } else {
+              const negativeEntropy = Math.floor(Math.random() * 1.0002);
+              return cell || negativeEntropy;
+            }
+          });
         });
-      });
 
-      const population = this.countPopulation(nextGrid);
+        const population = this.countPopulation(nextGrid);
 
-      return {
-        grid: nextGrid,
-        population,
-      };
-    });
+        return {
+          grid: nextGrid,
+          population,
+        };
+      },
+      () => this.playGrid(this.state.grid)
+    );
   };
   die() {
-    console.log("dying");
     const explosionSynth = new Tone.NoiseSynth({
       volume: -20,
       envelope: {
@@ -167,6 +169,7 @@ export default class GameOfLife extends Component {
 
     // Trigger the explosion sound
     explosionSynth.triggerAttackRelease("4n"); // Adjust the duration as needed
+    this.stop()
   }
 
   start() {
@@ -181,6 +184,7 @@ export default class GameOfLife extends Component {
 
   stop() {
     Tone.Transport.stop();
+    this.setState({ hasStarted: false });
   }
   componentDidMount(): void {
     console.log(Tone.Frequency(220).toNotation());
@@ -202,7 +206,7 @@ export default class GameOfLife extends Component {
   }
 
   componentDidUpdate(): void {
-    if (this.state.population === 0) {
+    if (this.state.population === 0 && this.state.grid.length) {
       this.die();
     }
   }
