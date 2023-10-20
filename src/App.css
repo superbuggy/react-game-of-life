@@ -1,4 +1,4 @@
-
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Pixels&display=swap");
 :root {
   --cell-size: 2%;
   --background-color: hsl(279, 32%, 23%);
@@ -6,10 +6,10 @@
 }
 
 .cells-container {
-  
+  position: relative;
   overflow: hidden;
   background: var(--background-color);
-  transition: .666s background;
+  transition: 0.666s background;
   margin: 0 auto;
   padding: 0;
   max-width: var(--container-size);
@@ -21,11 +21,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, var(--cell-size));
   grid-auto-rows: 1fr;
-  transition: .666s background;
+  transition: 0.666s background;
 }
 
 .cells-container::before {
-  content: '';
+  content: "";
   width: 0;
   padding-bottom: 100%;
   grid-row: 1 / 1;
@@ -44,28 +44,58 @@
   border: transparent;
 }
 
-.active {
-  transition: .5s background;
+.alive {
+  transition: 0.5s background;
   background: rgb(132, 233, 0);
 }
-.on-deck {
-  transition: .5s background;
-  background: rgba(9, 255, 0, 0.4);
+.being-born {
+  transition: 0.5s background;
+  background: rgba(233, 0, 183, 0.185);
 }
 .dying {
-  background: rgba(233, 0, 183, 0.185);
-  transition: .5s background;
-  animation: dying-flash .5s linear;
+  background: rgba(9, 255, 0, 0.4);
+  transition: 0.5s background;
+  animation: dying-flash 0.5s linear;
+}
+
+.start-button {
+  cursor: pointer;
+  position: absolute;
+  top: calc(45vmin - 3.75rem);
+  left: calc(45vmin - 3.75rem);
+  max-height: 4rem;
+  height: var(--cell-size);
+  padding: 0.5rem 0.75rem;
+  line-height: 4rem;
+  border-radius: 0.75rem;
+  font-size: 2rem;
+  font-family: "Rubik Pixels", monospace;
+  background-color: rgba(9, 255, 0, 0.1);
+  color: rgb(121, 213, 0);
+  text-align: center;
+  box-sizing: content-box;
+  text-shadow: 1px 1px 0px #000, 3px 3px 0px #000a;
+  box-shadow: 1px 1px 0px #79d50011, 3px 3px 0px #0007;
+}
+.start-button span {
+  text-transform: uppercase;
+  display: inline-block;
+  letter-spacing: 0.375rem;
+  transform: scale(1, 2);
+}
+
+.start-button:hover { 
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #79d50011, 1px 1px 0px #0007;
+
 }
 
 @keyframes dying-flash {
-  0% 
-  {
+  0% {
     background: rgba(184, 4, 255, 0.425);
   }
-  
-  100% 
-  {
+
+  100% {
     background: transparent;
   }
 }
