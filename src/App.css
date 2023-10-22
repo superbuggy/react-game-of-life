@@ -64,12 +64,10 @@
 }
 .being-born {
   transition: 0.5s background;
-  background: rgba(233, 0, 183, 0.185);
+  animation: gestating 2s ease-in;
 }
 .dying {
-  background: rgba(9, 255, 0, 0.4);
-  transition: 0.5s background;
-  animation: dying-flash 0.5s linear;
+  animation: dying 2s ease-out;
 }
 
 .start-button {
@@ -104,12 +102,27 @@
 
 }
 
-@keyframes dying-flash {
+
+@keyframes gestating {
   0% {
-    background: rgba(184, 4, 255, 0.425);
+
+    background: rgba(132, 233, 0, 0.05);
+    
+  }
+  
+  100% {
+    background: rgb(132, 233, 0);
+  }
+}
+
+@keyframes dying {
+  0% {
+    /* background: rgba(184, 4, 255, 0.425); */
+    background: rgba(9, 255, 0, 0.4);
+
   }
 
   100% {
-    background: transparent;
+    background: rgba(9, 255, 0, 0.05);
   }
 }
