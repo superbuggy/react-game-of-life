@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 
-const A440 = 440;
+const A440 = 27.5;
 
 export function map(
   inMin: number,
@@ -17,8 +17,10 @@ export const truncate = (number: number = 0) => Number(number.toFixed(2));
 export const centsFromHzToHz = (hz: number, fromHz: number = A440) =>
   1200 * Math.log2(hz / fromHz);
 
-export const centsOff = (hz: number, fromHz: number = A440) =>
-  truncate(centsFromHzToHz(hz, fromHz) % 100);
+export const centsOff = (hz: number, fromHz: number = A440) => {
+  const cents = truncate(centsFromHzToHz(hz, fromHz) % 100);
+  return cents >= 50 ? truncate(cents - 100) : cents;
+};
 
 export const noteHz = (hz: number) => Tone.Frequency(hz).toNote();
 
@@ -73,9 +75,9 @@ export function createSpiralArray(size: number): number[][] {
       turn();
       stepsTaken = 1;
       if (turns < 3) {
-        toTravel++
-      } else if (turns % 2 === 0){ 
-        toTravel++
+        toTravel++;
+      } else if (turns % 2 === 0) {
+        toTravel++;
       }
     }
   }

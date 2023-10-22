@@ -204,11 +204,11 @@ const GameOfLife: FC = () => {
     const nextNoteHigher = noteHz(
       toneLattice[rowIndex]?.[cellIndex] * 2 ** (1 / 12)
     );
-    console.log(note, nextNoteHigher);
     const cents = centsOff(toneLattice[rowIndex]?.[cellIndex]);
+    console.log(note, nextNoteHigher, cents);
     return {
       note: cents <= -50 ? nextNoteHigher : note,
-      cents: cents <= -50 ? truncate(cents + 100) : cents,
+      cents: cents === 0 ? "" : cents < 0 ? cents : `+${cents}`,
     };
   };
 
