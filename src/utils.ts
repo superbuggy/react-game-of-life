@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 
-const A440 = 27.5;
+const referenceHz = 27.5;
 
 export function map(
   inMin: number,
@@ -14,10 +14,10 @@ export function map(
 
 export const truncate = (number: number = 0) => Number(number.toFixed(2));
 
-export const centsFromHzToHz = (hz: number, fromHz: number = A440) =>
+export const centsFromHzToHz = (hz: number, fromHz: number = referenceHz) =>
   1200 * Math.log2(hz / fromHz);
 
-export const centsOff = (hz: number, fromHz: number = A440) => {
+export const centsOff = (hz: number, fromHz: number = referenceHz) => {
   const cents = truncate(centsFromHzToHz(hz, fromHz) % 100);
   return cents >= 50 ? truncate(cents - 100) : cents;
 };

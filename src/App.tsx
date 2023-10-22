@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, useRef, FC } from "react";
 import { map, make2DArray, centsOff, noteHz } from "./utils";
 import "./App.css";
 
@@ -10,6 +10,7 @@ interface GameState {
   rows: number;
   frequency: number;
   population: number;
+  generation: number;
   hasStarted: boolean;
 }
 
@@ -31,17 +32,21 @@ const countNeighbors = (grid: Grid, x: number, y: number) => {
 
 const GameOfLife: FC = () => {
   const size: number = 7;
-  const maxPopIsh: number = 0.25 * size ** 2;
-  // const minPopIsh = 0.1 * maxPopIsh; //0.25 * maxPopIsh;
-
+  const maxPopIsh: number = 0.5 * size ** 2;
   const [state, setState] = useState<GameState>({
     grid: make2DArray(size, size),
     columns: size,
     rows: size,
     frequency: 1000, //TODO: link to tempo/bpm
     population: 0,
+    generation: 1,
     hasStarted: false,
   });
+
+  // Refs
+  const synths = useRef<object[]>([]);
+  const filter = useRef(new Tone.Filter(4000, "lowpass", -24).toDestination());
+  const playingEventId = useRef<number>(-1);
 
   const randomizeGrid = (initialGrid: Grid): Grid => {
     const grid = initialGrid.map((column) => column.slice());
@@ -68,6 +73,49 @@ const GameOfLife: FC = () => {
     );
   };
 
+  // Setup
+  useEffect(() => {
+    const nextGridState = () => {
+      const nextGrid = (grid: Grid) =>
+        grid.map((row, rowIndex) => {
+          return row.map((cell, cellIndex) => {
+            const neighbors = countNeighbors(grid, rowIndex, cellIndex);
+            if (cell === 0 && neighbors === 3) {
+              return 1;
+            } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+              return 0;
+            } else {
+              const negativeEntropy = Math.floor(Math.random() * 1.0002);
+              return cell || negativeEntropy;
+            }
+          });
+        });
+      setState(({ grid: currentGrid, generation, ...prevState }: GameState) => {
+        const newGrid = nextGrid(currentGrid);
+        const population = countPopulation(newGrid);
+
+        return {
+          ...prevState,
+          grid: newGrid,
+          population,
+          generation: generation + 1,
+        };
+      });
+    };
+
+    playingEventId.current = Tone.Transport.scheduleRepeat(
+      () => {
+        nextGridState();
+      },
+      "1m",
+      "1m"
+    );
+    return () => {
+      Tone.Transport.clear(playingEventId.current);
+    };
+  }, []);
+
+  // Handle extinction
   useEffect(() => {
     if (state.hasStarted && state.population === 0) {
       const explosionSynth = new Tone.NoiseSynth({
@@ -94,10 +142,11 @@ const GameOfLife: FC = () => {
 
       boomOscillator.start(now).stop(now + 0.4);
       boomOscillator.frequency.rampTo(20, 0.4);
-      explosionSynth.triggerAttackRelease("4n");
+      explosionSynth.triggerAttackRelease("4n", now);
 
       Tone.Transport.stop();
       setState((priorState) => ({ ...priorState, hasStarted: false }));
+      Tone.Transport.clear(playingEventId.current);
     }
   }, [state.population, state.hasStarted]);
 
@@ -120,20 +169,24 @@ const GameOfLife: FC = () => {
   const toneLattice: Grid = makeToneLattice(make2DArray(size, size));
 
   useEffect(() => {
-    const synth: Tone.PolySynth = new Tone.PolySynth().toDestination();
-    synth.volume.value = map(
-      state.population,
-      maxPopIsh,
-      -24,
-      -6,
-      state.population
-    );
     const playTones = (frequencies: number[]) => {
-      console.log("==", frequencies.length);
+      const synth: Tone.PolySynth = new Tone.PolySynth(); //.toDestination();
+      synth.connect(filter.current);
+      synths.current.push({ synth, generation: state.generation });
+      console.log(synths);
+      if (synths.current.length === 3) {
+        const freedSynth = synths.current.shift();
+        // @ts-ignore
+        if (freedSynth !== synth) freedSynth?.synth.dispose(); 
+      }
+      synth.volume.value = -24; //map(1, maxPopIsh, -21, -24, state.population);
+      const velocity = map(0, 1, 0.3, 1, 1 / frequencies.length);
+      const duration = `${map(1, maxPopIsh, 1, 0.333, frequencies.length)}m`;
       const sequence = new Tone.Sequence(
         (time, note) => {
-          console.log("beep");
-          synth.triggerAttackRelease(note, ".95m", time);
+          console.log(synth)          
+          // @ts-ignore
+          if (!synth._wasDisposed) synth.triggerAttackRelease(note, duration, time, velocity);
         },
         frequencies,
         `${frequencies.length}n`
@@ -154,58 +207,12 @@ const GameOfLife: FC = () => {
     playGrid(state.grid);
   }, [state.grid, maxPopIsh, state.population, toneLattice]);
 
-  useEffect(() => {
-    const nextGridState = () => {
-      const nextGrid = (grid: Grid) =>
-        grid.map((row, rowIndex) => {
-          return row.map((cell, cellIndex) => {
-            const neighbors = countNeighbors(grid, rowIndex, cellIndex);
-            if (cell === 0 && neighbors === 3) {
-              return 1;
-            } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-              return 0;
-            } else {
-              const negativeEntropy = Math.floor(Math.random() * 1.0002);
-              return cell || negativeEntropy;
-            }
-          });
-        });
-      setState(({ grid: currentGrid, ...prevState }: GameState) => {
-        const newGrid = nextGrid(currentGrid);
-        const population = countPopulation(newGrid);
-
-        return {
-          ...prevState,
-          grid: newGrid,
-          population,
-        };
-      });
-    };
-
-    // const updateCSS = () => {
-    // document.documentElement.style.setProperty("--cell-size", `${100 / size}%`);
-    // const hue = map(minPopIsh, maxPopIsh * 0.7, 268 * 1.3, 154, state.population);
-    // const light = map(minPopIsh, maxPopIsh, 15, 35, state.population);
-    // document.documentElement.style.setProperty("--background-color", `hsl(${hue}, 78%, ${light}%)`);
-    // };
-
-    // updateCSS();
-
-    const playingEventId = Tone.Transport.scheduleRepeat(() => {
-      nextGridState();
-    }, "1m");
-    return () => {
-      Tone.Transport.clear(playingEventId);
-    };
-  }, []);
-
   const cellLabel = (rowIndex: number, cellIndex: number) => {
     const note = noteHz(toneLattice[rowIndex]?.[cellIndex]);
     const nextNoteHigher = noteHz(
       toneLattice[rowIndex]?.[cellIndex] * 2 ** (1 / 12)
     );
     const cents = centsOff(toneLattice[rowIndex]?.[cellIndex]);
-    console.log(note, nextNoteHigher, cents);
     return {
       note: cents <= -50 ? nextNoteHigher : note,
       cents: cents === 0 ? "" : cents < 0 ? cents : `+${cents}`,
