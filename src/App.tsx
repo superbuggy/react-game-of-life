@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { useEffect, useState, FC } from "react";
-import { map, make2DArray, centsOff, noteHz, truncate } from "./utils";
+import { map, make2DArray, centsOff, noteHz } from "./utils";
 import "./App.css";
 
 type Grid = number[][];
