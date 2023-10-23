@@ -21,5 +21,3 @@ node_modules
 *.sln
 *.sw?
 .vite
-dist/
-dist/
