@@ -126,3 +126,14 @@
     background: rgba(9, 255, 0, 0.05);
   }
 }
+
+@media (max-width: 450px) {
+  .square span sup {
+    display: block;
+    line-height: .625rem;
+
+  }
+  .square span { 
+    line-height: 1rem;
+  }
+}
